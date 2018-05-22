@@ -173,37 +173,73 @@ public class Main {
         }
     }
 
-    public static void phaseMatching(String[][][] docArray) {
+    public static double[] phaseMatching(String line1, String line2){
 
-        // 升序比较器
-        // ref: https://crane-yuan.github.io/2016/08/15/The-map-of-java-sorted-by-value/
-        Comparator<Map.Entry<String, Integer>> valueComparator = new Comparator<Map.Entry<String, Integer>>() {
-            @Override
-            public int compare(Map.Entry<String, Integer> o1,
-                               Map.Entry<String, Integer> o2) {
-                // TODO Auto-generated method stub
-                return o1.getValue() - o2.getValue();
+        // ref: http://www.avajava.com/tutorials/lessons/how-do-i-use-numberformat-to-format-a-percent.html
+        // % format
+        NumberFormat defaultFormat = NumberFormat.getPercentInstance();
+        defaultFormat.setMinimumFractionDigits(1);
+
+        double wordCount;
+        double matchWords = 0;
+        int matchCounter = 0;
+        double[] result = new double[2];
+
+        line1 = line1.toLowerCase();
+        line1 = line1.replaceAll("[\\,\\.\\'\\n]|^-$","");
+        line2 = line2.toLowerCase();
+        line2 = line2.replaceAll("[\\,\\.\\'\\n]|^-$","");
+
+        String[] phase1 = line1.split(" ");
+        String[] phase2 = line2.split(" ");
+
+        sysPrint("doc1 word count: " + phase1.length + " doc2 word count: " + phase2.length);
+
+        wordCount = phase2.length;
+
+        for (int w1=0; w1 < phase1.length; w1++){
+            sysPrint("Word count" + w1);
+            for(int w2=0; w2 < phase2.length; w2++){
+                if( Objects.equals(phase1[w1].toLowerCase(),phase2[w2].toLowerCase())){
+                    // First word matched, check next
+                    if(((w1 + 2) < phase1.length) && ((w2 + 2) < phase2.length)){
+                        if(Objects.equals(phase1[(w1+2)].toLowerCase(),phase2[(w2+2)].toLowerCase())){
+                            matchCounter++;
+                            sysPrint("word count" + (w1) + " Matched phase1: " + phase1[(w1)] + " phase2: " + phase2[(w2)] + " Matched " + matchWords + " match Counter " + matchCounter);
+                            for(int wAdj=1; (wAdj + w1) < phase1.length && (wAdj + w2) < phase2.length; wAdj++){
+                                if( Objects.equals(phase1[(w1+wAdj)].toLowerCase(),phase2[(w2+wAdj)].toLowerCase())){
+                                    matchWords++;
+                                    matchCounter++;
+                                    sysPrint("word count" + (w1+wAdj) + " Matched phase1: " + phase1[(w1+wAdj)] + " phase2: " + phase2[(w2+wAdj)] + " Matched " + matchWords + " match Counter " + matchCounter);
+
+                                    // End of loop problem
+                                    if ((wAdj + w1 + 1 == phase1.length) || (wAdj + w2 + 1 == phase2.length)){
+                                        sysPrint("End of the loop");
+                                        matchWords++; // Add back the first match
+                                        w1 = w1 + matchCounter - 1; // Reduce 1 due to the loop structure
+                                        matchCounter = 0;
+                                        break; // Stop the loop
+                                    }
+                                } else {
+                                    sysPrint("No More Matches");
+                                    matchWords++; // Add back the first match
+                                    w1 = w1 + matchCounter; // Override the Main loop
+                                    matchCounter = 0;
+                                    break; // Terminate the loop to save resources
+                                }
+                            }
+                        }
+                    }
+                }
             }
-        };
-
-        for (int d1 = 0; d1 < docArray.length; d1++) {
-           for (int d2 = 0; d2< docArray.length; d2++) {
-               if (d2 != d1){
-                   for (int s1 = 0; s1< docArray[d1].length; s1++) {
-                       for (int s2 =0; s2<docArray[d2].length; s2++) {
-                           for (int w1 = 0; w1< docArray[d1][s1].length; w1++) {
-                               for (int w2 = 0; w2< docArray[d2][s2].length; w2++) {
-                                       if (w2 == w1){
-                                           w2++; w1++; sysPrint( "doc " + d1 + " " + docArray[d1][s1][w1]  + "\n");
-                                       }
-                                       if (w2 != w1){
-                                       }
-                               }
-                           }
-                       }
-                   }
-               }
-           }
         }
+        sysPrint("Matched word count " + matchWords);
+        sysPrint("Total Doc2 Word Count " + wordCount);
+        sysPrint("Match% " +  defaultFormat.format((matchWords / wordCount)));
+
+        result[0] = matchWords;
+        result[1] = wordCount;
+
+        return result;
     }
 }
