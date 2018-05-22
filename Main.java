@@ -22,7 +22,7 @@ public class Main {
         // Remove Punctuation, space, new lines and quote marks
         // Word Frequency
         termFreq(docArray);
-
+        phaseMatching(docArray);
         // Phrase Matching
         // Compare each files
         // Ignore matches in quote marks
@@ -36,7 +36,7 @@ public class Main {
         System.out.println(msg);
     }
 
-    public static boolean regex(String text, String pattern){
+    public static boolean regex(String text, String pattern) {
         // String to be scanned to find the pattern.
         String line = text;
         String regexPattern = pattern;
@@ -46,33 +46,33 @@ public class Main {
 
         // Now create matcher object.
         Matcher m = r.matcher(line);
-        if (m.find( )) {
+        if (m.find()) {
             return true;
-        }else {
+        } else {
             return false;
         }
     }
 
-    public static void arrayPrint(String[][][] sArray){
+    public static void arrayPrint(String[][][] sArray) {
         // backup code for the array testing
-        for (int d = 0; d < sArray.length; d++){
+        for (int d = 0; d < sArray.length; d++) {
             for (int s = 0; s < sArray[d].length; s++) {
-                for (String w: sArray[d][s]){
-                    sysPrint( "Doc: " + d + " Line:" + s + " word:" + w + "\n");
+                for (String w : sArray[d][s]) {
+                    sysPrint("Doc: " + d + " Line:" + s + " word:" + w + "\n");
                 }
             }
         }
     }
 
-    public static void checkArgs(String[] args){
+    public static void checkArgs(String[] args) {
         // ref: https://stackoverflow.com/questions/890966/what-is-string-args-parameter-in-main-method-java
         // Check # of Args passed
-        for(int i = 0; i < args.length; i++) {
+        for (int i = 0; i < args.length; i++) {
             sysPrint(args[i] + "\n");
         }
 
         // Check if Doc Path is specified
-        if (args.length == 0){
+        if (args.length == 0) {
             sysPrint("No doc path was given! Shutting down now .......");
             //System.exit(1);
         }
@@ -80,8 +80,8 @@ public class Main {
 
     }
 
-    public static String[][][] genTxtArray( String[] args){
-        int nDoc=0;
+    public static String[][][] genTxtArray(String[] args) {
+        int nDoc = 0;
         int nLine;
         String[][][] docArray;
 
@@ -108,7 +108,7 @@ public class Main {
                     docArray[nDoc] = new String[streamArray.length][];
 
                     // Operation of each array
-                    for(int n=0; n < streamArray.length; n++){
+                    for (int n = 0; n < streamArray.length; n++) {
                         sysPrint("Line" + n + ": " + streamArray[n] + "\n");
                         sysPrint("mCounter" + nDoc + " sCounter" + nLine + "\n");
                         // Tokenize the words from the each sentence
@@ -126,29 +126,29 @@ public class Main {
         return docArray;
     }
 
-    public static void termFreq(String[][][] docArray){
+    public static void termFreq(String[][][] docArray) {
 
         // 升序比较器
         // ref: https://crane-yuan.github.io/2016/08/15/The-map-of-java-sorted-by-value/
-        Comparator<Map.Entry<String, Integer>> valueComparator = new Comparator<Map.Entry<String,Integer>>() {
+        Comparator<Map.Entry<String, Integer>> valueComparator = new Comparator<Map.Entry<String, Integer>>() {
             @Override
             public int compare(Map.Entry<String, Integer> o1,
                                Map.Entry<String, Integer> o2) {
                 // TODO Auto-generated method stub
-                return o1.getValue()-o2.getValue();
+                return o1.getValue() - o2.getValue();
             }
         };
 
-        for (int d=0;d<docArray.length;d++){
+        for (int d = 0; d < docArray.length; d++) {
             // ref: https://stackoverflow.com/questions/21771566/calculating-frequency-of-each-word-in-a-sentence-in-java
             Map<String, Integer> map = new TreeMap<>(Collections.reverseOrder());
-            for (int s=0;s<docArray[d].length;s++){
+            for (int s = 0; s < docArray[d].length; s++) {
                 for (String w : docArray[d][s]) {
                     w = w.toLowerCase();
                     // remove punctuation
-                    w = w.replaceAll("[\\,\\s\\.\\'\"\\n]|^-$","");
+                    w = w.replaceAll("[\\,\\s\\.\\'\"\\n]|^-$", "");
 
-                    if (w != " " && w != "\n"  && w != "" && w.length() > 0){
+                    if (w != " " && w != "\n" && w != "" && w.length() > 0) {
                         // change all to lower case for more effective analysis
                         Integer n = map.get(w);
                         n = (n == null) ? 1 : ++n;
@@ -162,14 +162,48 @@ public class Main {
 
             // 排序
             // ref: https://stackoverflow.com/questions/5894818/how-to-sort-arraylistlong-in-java-in-decreasing-order
-            Collections.sort(list,valueComparator);
+            Collections.sort(list, valueComparator);
             Collections.reverse(list);
 
             // 默认情况下，TreeMap对key进行升序排序
-            System.out.println("------------Doc " + d +"--------------------");
+            System.out.println("------------Doc " + d + "--------------------");
             for (Map.Entry<String, Integer> entry : list) {
-                System.out.println( entry.getKey() + ":" + entry.getValue());
+                System.out.println(entry.getKey() + ":" + entry.getValue());
             }
+        }
+    }
+
+    public static void phaseMatching(String[][][] docArray) {
+
+        // 升序比较器
+        // ref: https://crane-yuan.github.io/2016/08/15/The-map-of-java-sorted-by-value/
+        Comparator<Map.Entry<String, Integer>> valueComparator = new Comparator<Map.Entry<String, Integer>>() {
+            @Override
+            public int compare(Map.Entry<String, Integer> o1,
+                               Map.Entry<String, Integer> o2) {
+                // TODO Auto-generated method stub
+                return o1.getValue() - o2.getValue();
+            }
+        };
+
+        for (int d1 = 0; d1 < docArray.length; d1++) {
+           for (int d2 = 0; d2< docArray.length; d2++) {
+               if (d2 != d1){
+                   for (int s1 = 0; s1< docArray[d1].length; s1++) {
+                       for (int s2 =0; s2<docArray[d2].length; s2++) {
+                           for (int w1 = 0; w1< docArray[d1][s1].length; w1++) {
+                               for (int w2 = 0; w2< docArray[d2][s2].length; w2++) {
+                                       if (w2 == w1){
+                                           w2++; w1++; sysPrint( "doc " + d1 + " " + docArray[d1][s1][w1]  + "\n");
+                                       }
+                                       if (w2 != w1){
+                                       }
+                               }
+                           }
+                       }
+                   }
+               }
+           }
         }
     }
 }
