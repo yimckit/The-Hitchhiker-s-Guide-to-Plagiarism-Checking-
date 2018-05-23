@@ -14,26 +14,28 @@ public class Main {
     public static void main(String[] args) {
         sysPrint("Running the program to scan all the files now!\n");
 
+        // Check the links
         checkArgs(args);
 
         // Reads in files and Tokenises the content into array
         String[][][] docArray = genTxtArray(args);
-
+        // Count the number of words in each file
         termFreq(docArray);
-
+        //Phase Matching of the file
         phaseMatching(docArray);
 
-        // PhaseMatching(docArray);
-        // PhraseMatching;
+
+
         // Compare each files
         // Ignore matches in quote marks
         // Rank Result
         // Display Screen
 
-        sysPrint("All the processed are finished GLHF!");
+        sysPrint("All the processed are finished.");
     }
 
     public static void sysPrint(String msg) {
+        //Print out all the information in words
         System.out.println(msg);
     }
 
@@ -45,7 +47,7 @@ public class Main {
         // Create a Pattern object
         Pattern r = Pattern.compile(regexPattern);
 
-        // Now create matcher object.
+        // Create matcher object.
         Matcher m = r.matcher(line);
         if (m.find( )) {
             return true;
@@ -55,7 +57,7 @@ public class Main {
     }
 
     public static void arrayPrint(String[][][] sArray){
-        // backup code for the array testing
+        // Backup code for the array testing
         for (int d = 0; d < sArray.length; d++){
             for (int s = 0; s < sArray[d].length; s++) {
                 for (String w: sArray[d][s]){
@@ -85,6 +87,7 @@ public class Main {
         String[][][] docArray;
 
         // ref: https://stackoverflow.com/questions/5694385/getting-the-filenames-of-all-files-in-a-folder
+        // Link for development use
 //        File folder = new File("C://Users/User/Desktop/SCC110/Project3TestFiles/");
         File folder = new File(args[0]);
 
@@ -109,8 +112,8 @@ public class Main {
 
                     // Operation of each array
                     for(int n=0; n < streamArray.length; n++){
-                        sysPrint("Line" + n + ": " + streamArray[n] + "\n");
-                        sysPrint("mCounter" + nDoc + " sCounter" + nLine + "\n");
+                        sysPrint("Line" + (n + 1) + ": " + streamArray[n] + "\n");
+//                        sysPrint("mCounter" + nDoc + " sCounter" + nLine + "\n");
                         // Tokenize the words from the each sentence
                         // http://javadevnotes.com/java-string-split-tutorial-and-examples
                         streamArray[n] = streamArray[n].toLowerCase();
@@ -130,10 +133,9 @@ public class Main {
 
     public static void termFreq(String[][][] docArray){
 
-        // 升序比较器
         // ref: https://crane-yuan.github.io/2016/08/15/The-map-of-java-sorted-by-value/
         Comparator<Map.Entry<String, Integer>> valueComparator = new Comparator<Map.Entry<String,Integer>>() {
-            @Override
+            // @Override
             public int compare(Map.Entry<String, Integer> o1,
                                Map.Entry<String, Integer> o2) {
                 // TODO Auto-generated method stub
@@ -146,11 +148,9 @@ public class Main {
             Map<String, Integer> map = new TreeMap<>(Collections.reverseOrder());
             for (int s=0;s<docArray[d].length;s++){
                 for (String w : docArray[d][s]) {
-                    //w = w.toLowerCase();
-                    //Remove punctuation
-                    //w = w.replaceAll("[\\,\\s\\.\\'\"\\n]|^-$","");
 
                     if (w != " " && w != "\n"  && w != "" && w.length() > 0){
+                        // remove all the punctuation
                         // change all to lower case for more effective analysis
                         Integer n = map.get(w);
                         n = (n == null) ? 1 : ++n;
@@ -159,16 +159,13 @@ public class Main {
                 }
             }
 
-            // map转换成list进行排序
             List<Map.Entry<String, Integer>> list = new ArrayList<>(map.entrySet());
 
-            // 排序
             // ref: https://stackoverflow.com/questions/5894818/how-to-sort-arraylistlong-in-java-in-decreasing-order
             Collections.sort(list,valueComparator);
             Collections.reverse(list);
 
-            // 默认情况下，TreeMap对key进行升序排序
-            System.out.println("------------Doc " + d +" Frequency Count --------------------");
+            System.out.println("------------Doc " + (d + 1)+" Frequency Count --------------------");
             for (Map.Entry<String, Integer> entry : list) {
                 System.out.println( entry.getKey() + ":" + entry.getValue());
             }
@@ -188,9 +185,9 @@ public class Main {
 
         for (int w1=0; w1 < phase1.length; w1++){
             for(int w2=0; w2 < phase2.length; w2++){
-//                sysPrint("Word count" + w2);
+                //First word matched
                 if( Objects.equals(phase1[w1],phase2[w2])){
-                    // First word matched, check next
+                    // Check next word
                     if(((w1 + 2) < phase1.length) && ((w2 + 2) < phase2.length)){
                         if(Objects.equals(phase1[(w1+2)],phase2[(w2+2)])){
                             matchCounter++;
@@ -210,7 +207,8 @@ public class Main {
                                         break; // Stop the loop
                                     }
 
-                                } else {
+                                }
+                                else {
 //                                    sysPrint("No More Matches");
                                     matchWords++; // Add back the first match
                                     w1 = w1 + matchCounter; // Override the Main loop
@@ -240,7 +238,7 @@ public class Main {
         }
 
         for(int i = 0; i < totalWords.length; i++){
-            sysPrint("Total word count for Doc" + i + " is " + totalWords[i]);
+            sysPrint("Total word count for Doc" + ( i + 1 ) + " is " + totalWords[i]);
         }
 
         return totalWords;
@@ -248,7 +246,7 @@ public class Main {
     }
 
     public static void phaseMatching(String[][][] docArray){
-        sysPrint("------------ Phase Matching --------------------");
+//        sysPrint("------------ Phase Matching --------------------");
 
         // ref: http://www.avajava.com/tutorials/lessons/how-do-i-use-numberformat-to-format-a-percent.html
         // % format
@@ -274,11 +272,12 @@ public class Main {
         }
 
         sysPrint("------------ Printing the phase matching summary --------------------");
+        // Show the matching %
         for(int doc1=0; doc1<totalMatch.length;doc1++){
             for (int doc2=0; doc2<totalMatch.length;doc2++){
                 if (doc1!=doc2){
                     double matching = ((double)totalMatch[doc1][doc2] / (double)totalWords[doc2]);
-                    sysPrint("Doc " + doc1 + " compare to Doc " + doc2 + " Matched " + totalMatch[doc1][doc2] + " / Total " + totalWords[doc2] + " (" + defaultFormat.format(matching) + ") ");
+                    sysPrint("Doc " + (doc1 + 1) + " compare to Doc " + (doc2 + 1) + " Matched " + totalMatch[doc1][doc2] + " / Total " + totalWords[doc2] + " (" + defaultFormat.format(matching) + ") ");
                 }
             }
         }
